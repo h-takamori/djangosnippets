@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block main %}
+<h2>スニペットの削除</h2>
+<p>以下のスニペットを削除しますか？</p>
+<form>
+    <fieldset disabled>
+        {% bootstrap_form form %}
+    </fieldset>
+</form>
+<form method="post" class="d-inline">
+    {% csrf_token %}
+    {% bootstrap_button button_type="submit" content="はい" %}
+</form>
+<a class="btn btn-primary" href="{% url 'snippet_detail' snippet.id %}">いいえ</a>
+{% endblock %}

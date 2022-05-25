@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load pygmentize %}
+
+{% block extraheader %}
+<style>{% pygments_css %}</style>
+{% endblock %}
+
+{% block main %}
+<h2>{{ snippet.title }} by {{ snippet.created_by.username }}</h2>
+
+<div class="snippet-date">
+    投稿日: {{ snippet.created_at | date:"DATETIME_FORMAT" }}
+    {% if user.is_authenticated and snippet.created_by_id == user.id %}
+    <a href="{% url 'snippet_edit' snippet.id %}">編集</a>
+    <a href="{% url 'snippet_delete' snippet.id %}">削除</a>
+    <!-- <form method="POST" action="{% url 'snippet_delete' snippet.id %}" style="display:inline;">
+        {% csrf_token %}
+        <a href="javascript:void(0)" onclick="if (confirm('このスニペットを削除しますか？')) this.parentNode.submit()">削除</a>
+    </form> -->
+    <!-- <a href="{% url 'snippet_delete' snippet.id %}" onclick="return confirm('このスニペットを削除しますか？')">削除</a> -->
+    {% endif %}
+</div>
+
+<div class="source-code">
+    {{ snippet.code | pygmentize:"python3" }}
+</div>
+
+<p>{{ snippet.description | urlize }}</p>
+
+<div class="comments">
+    <h3>コメント一覧</h3>
+    {% if comments %}
+        {% for comment in comments %}
+            <p>{{ comment.text }}</p>
+            <p>by {{ comment.commented_by.username }} さん {{ comment.commented_at | date:"DATETIME_FORMAT" }}</p>
+        {% endfor %}
+    {% else %}
+        <p>コメントはまだありません。</p>
+    {% endif %}
+    {% if user.is_authenticated %}
+        <h3>コメントを投稿する</h3>
+        <form method="post" action="{% url 'comment_new' snippet.id %}">
+            {% csrf_token %}
+            {% bootstrap_form comment_form %}
+            {% bootstrap_button button_type="submit" content="コメント" %}
+        </form>
+    {% endif %}
+</div>
+    
+{% endblock %}
